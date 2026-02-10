@@ -34,69 +34,30 @@ if "example_feedback" not in st.session_state:
 with st.sidebar:
     st.header("⚙️ 配置")
 
-    # API配置
+    # API配置 - 简化版
     st.subheader("API 配置")
 
-    # API提供商选择
-    api_provider = st.selectbox(
-        "选择API提供商",
-        ["OpenAI", "DeepSeek"],
-        help="DeepSeek使用OpenAI兼容的API格式"
-    )
+    # 固定使用DeepSeek提供商
+    api_provider = "DeepSeek"
 
-    # API密钥输入 - 支持环境变量、Secrets和手动输入
-    default_api_key = ""
-
-    # 尝试从Streamlit Secrets获取
+    # 从Secrets获取API Key
+    api_key = ""
     try:
-        if api_provider == "OpenAI" and "OPENAI_API_KEY" in st.secrets:
-            default_api_key = st.secrets["OPENAI_API_KEY"]
-        elif api_provider == "DeepSeek" and "DEEPSEEK_API_KEY" in st.secrets:
-            default_api_key = st.secrets["DEEPSEEK_API_KEY"]
+        if "DEEPSEEK_API_KEY" in st.secrets:
+            api_key = st.secrets["DEEPSEEK_API_KEY"]
+            st.caption("✅ API Key已从Secrets自动加载")
+        else:
+            # 如果Secrets中没有，尝试从环境变量获取
+            api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+            if api_key:
+                st.caption("✅ API Key已从环境变量自动加载")
+            else:
+                st.warning("⚠️ 未找到DEEPSEEK_API_KEY，请在Secrets或环境变量中配置")
     except Exception:
-        pass  # 如果没有配置secrets，继续使用环境变量
+        st.error("❌ 读取API Key时出错")
 
-    # 如果Secrets中没有，尝试从环境变量获取
-    if not default_api_key:
-        if api_provider == "OpenAI":
-            default_api_key = os.environ.get("OPENAI_API_KEY", "")
-        elif api_provider == "DeepSeek":
-            default_api_key = os.environ.get("DEEPSEEK_API_KEY", "")
-
-    # 显示输入框，预填充从Secrets或环境变量获取的值
-    api_key = st.text_input(
-        f"{api_provider} API Key",
-        value=default_api_key,
-        type="password",
-        help="输入您的API密钥。也可以通过在环境变量或Secrets中设置来自动加载。"
-    )
-
-    # 显示提示信息
-    if default_api_key:
-        source = "环境变量"
-        try:
-            # 检查是否来自Secrets
-            if api_provider == "OpenAI" and "OPENAI_API_KEY" in st.secrets:
-                source = "Secrets"
-            elif api_provider == "DeepSeek" and "DEEPSEEK_API_KEY" in st.secrets:
-                source = "Secrets"
-        except Exception:
-            pass
-        st.caption(f"✅ API Key已从{source}自动加载。您可以直接使用或修改。")
-
-    # 模型选择
-    if api_provider == "OpenAI":
-        model_options = ["gpt-4-turbo-preview", "gpt-4", "gpt-3.5-turbo"]
-        default_model = "gpt-4-turbo-preview"
-    else:  # DeepSeek
-        model_options = ["deepseek-chat", "deepseek-coder"]
-        default_model = "deepseek-chat"
-
-    model = st.selectbox(
-        "选择模型",
-        model_options,
-        index=model_options.index(default_model) if default_model in model_options else 0
-    )
+    # 固定使用deepseek-chat模型
+    model = "deepseek-chat"
 
     # 核心参数调节
     st.subheader("核心参数调节")
@@ -350,7 +311,7 @@ def analyze_feedback(feedback: str, api_key: str, model: str, temperature: float
 # ========== 处理按钮点击 ==========
 if parse_button:
     if not api_key:
-        st.error("⚠️ 请先在侧边栏输入API Key")
+        st.error("⚠️ 未找到API Key，请在Secrets或环境变量中配置DEEPSEEK_API_KEY")
     elif not feedback_input:
         st.error("⚠️ 请输入反馈内容")
     else:
