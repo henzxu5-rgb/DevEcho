@@ -1,193 +1,327 @@
 # DevEcho: 开发者反馈智能转化 Agent
 
-一个基于 Streamlit 的 AI Agent 原型工具，将零散的开发者反馈（Bug、建议、吐槽）转化为标准化的产品需求文档（PRD）。
+<div align="center">
 
-## ✨ 核心功能
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![DeepSeek](https://img.shields.io/badge/DeepSeek-AI-007AFF?style=for-the-badge&logo=openai&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-- **智能反馈解析**：从混乱的开发者反馈中提取技术关键点
-- **专业PRD生成**：输出标准化的产品需求文档，包含技术实现方案
-- **思考过程可视化**：展示Agent如何拆解反馈、识别意图
-- **多平台支持**：处理GitHub Issues、Discord讨论、微信群聊等来源的反馈
-- **集成DeepSeek AI**：基于DeepSeek API进行智能分析
+**将零散的开发者反馈转化为标准化、可执行的产品需求文档**
 
-## 🚀 快速开始
+[快速开始](#-快速开始) • [核心功能](#-核心功能) • [技术架构](#-技术架构)
 
-### 1. 安装依赖
-```bash
-pip install -r requirements.txt
+</div>
+
+## 📖 项目背景
+
+在软件开发过程中，开发者反馈（Bug报告、功能建议、性能吐槽）往往以碎片化形式存在于GitHub Issues、Discord讨论、微信群聊等不同渠道。这些反馈通常包含：
+
+- **技术细节缺失**：仅有现象描述，缺乏底层原因分析
+- **优先级模糊**：凭感觉评估重要性，缺乏量化依据
+- **方案不完整**：只考虑正常流程，忽略异常场景处理
+- **格式混乱**：需要人工整理为标准化文档
+
+DevEcho 旨在解决这些问题，通过AI Agent将混乱的反馈转化为**技术深度、量化优先级、完整异常覆盖**的标准PRD。
+
+## ✨ 核心功能亮点
+
+### 🎯 1. 技术专家视角分析
+突破传统产品经理的模糊表述，Agent从三个技术层面深入分析问题：
+
+| 分析层面 | 具体关注点 | 示例问题 |
+|---------|-----------|---------|
+| **操作系统底层** | 文件句柄泄漏、内存管理、进程调度、系统调用瓶颈 | "高并发下内存泄漏"、"系统调用频繁导致性能下降" |
+| **网络协议** | TCP连接池、HTTP/2流控制、TLS握手、DNS解析、CDN缓存 | "API响应慢可能是TCP连接复用问题" |
+| **代码实现架构** | 异步任务队列、数据库连接池、缓存策略、序列化性能 | "数据库连接池配置不当导致连接泄漏" |
+
+### 📊 2. RICE模型量化优先级评估
+取代主观的P0/P1/P2/P3分级，引入行业标准的RICE评估模型：
+
+```yaml
+RICE评分公式: (Reach × Impact × Confidence) ÷ Effort
+
+Reach（影响范围）: 90天内受影响的用户/开发者数量
+Impact（影响程度）: 3=巨大影响, 2=高影响, 1=中等影响, 0.5=低影响
+Confidence（置信度）: 100%=高信度, 80%=中高信度, 50%=中信度
+Effort（工作量）: "2人周"、"1人月"等团队工作量估算
+
+输出示例:
+- Reach: 500用户（占活跃用户20%）
+- Impact: 2.5（高影响，影响核心功能使用）
+- Confidence: 80%（技术方案成熟）
+- Effort: 1.5人周
+- RICE分数: (500 × 2.5 × 0.8) ÷ 1.5 = 666.67
+- 优先级建议: 高优先级（分数>500）
 ```
 
-### 2. 运行应用
-```bash
-streamlit run app.py
+### 🛡️ 3. 强制性异常流程覆盖
+每个功能需求必须包含至少3个异常场景处理方案：
+
+| 异常类型 | 处理策略 | 技术实现 |
+|---------|---------|---------|
+| **网络中断** | 优雅降级、本地缓存、重试机制 | 指数退避重试、离线队列 |
+| **服务超时** | 超时控制、熔断机制、降级方案 | 断路器模式、超时配置 |
+| **并发冲突** | 乐观锁、分布式锁、事务隔离 | Redis锁、数据库行锁 |
+| **数据不一致** | 最终一致性、补偿事务、数据校验 | 消息队列、Saga模式 |
+| **权限异常** | 细粒度权限控制、审计日志 | RBAC模型、操作日志 |
+
+### 🔍 4. 思考过程可视化
+实时展示Agent的分析思路，增强结果可信度：
+```
+🤔 Agent 思考逻辑
+├── 第一遍阅读：整体印象，识别主要/次要问题
+├── 第二遍阅读：提取技术关键词、业务上下文
+├── 第三遍阅读：关联系统架构，推测实现难度
+├── 第四遍阅读：评估优先级和影响范围
+└── 第五遍阅读：构思解决方案和权衡取舍
 ```
 
-### 3. 配置使用
-1. **配置API Key**（推荐使用Streamlit Secrets，详见下方配置说明）
-2. 粘贴开发者反馈到主输入框
-3. 点击"开始智能解析"
-4. 查看Agent思考过程和生成的PRD
+## 🖼️ 功能界面预览
 
-> **注意**：应用已固定使用DeepSeek API，无需手动选择供应商或模型。API Key会自动从Streamlit Secrets或环境变量加载。
+> *注：此处为界面描述，实际部署后可添加截图*
 
-## ☁️ 部署到 Streamlit Cloud
+### 主工作区
+- **反馈输入框**：支持多行文本输入，自动识别GitHub Issue、Discord聊天等格式
+- **智能解析按钮**：一键启动三层分析框架
+- **实时进度显示**：st.status组件展示Agent思考过程
+- **PRD展示区**：格式化显示完整产品需求文档
 
-### 方法一：一键部署（推荐）
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://streamlit.io/cloud)
+### 侧边栏配置
+- **API配置**：自动从Streamlit Secrets加载DeepSeek API Key（用户零配置）
+- **参数调节**：创造力温度（0.0-1.0）、深度分析模式切换
+- **示例库**：5类典型反馈示例，一键填充测试
 
-1. Fork 本仓库到您的 GitHub 账户
-2. 访问 [Streamlit Cloud](https://streamlit.io/cloud)
-3. 点击 "New app" → 选择本仓库
-4. 配置以下设置：
-   - **Main file path**: `app.py`
-   - **Python version**: 3.10 (自动检测)
-5. 点击 "Deploy"
-
-### 方法二：手动部署
-```bash
-# 克隆仓库
-git clone https://github.com/your-username/DevEcho.git
-cd DevEcho
-
-# 部署到 Streamlit Cloud
-# 通过 Web 界面或 CLI 工具部署
-```
-
-### 配置 Secrets（API 密钥安全存储）
-在 Streamlit Cloud 上，通过以下方式安全设置 API 密钥：
-
-1. **在线编辑器**：App → Settings → Secrets
-2. **CLI 工具**：使用 `streamlit secrets` 命令
-3. **文件上传**：上传 `.streamlit/secrets.toml`
-
-#### secrets.toml 格式：
-```toml
-# DeepSeek API配置（必需）
-DEEPSEEK_API_KEY = "您的DeepSeek API密钥"
-```
-
-### 环境变量配置
-也可以在 Streamlit Cloud 的 "Settings" → "Secrets" 中设置环境变量。
-
-### 注意事项
-- ⚠️ **不要**将包含密钥的 `secrets.toml` 提交到 Git
-- ✅ 使用 `.gitignore` 保护敏感文件
-- 🔒 Streamlit Cloud 提供安全的 Secrets 管理
-- 🌐 应用将获得一个永久的公共 URL
-
-## 🎯 使用场景
-
-### 场景1：GitHub Issues处理
-将杂乱的Issue描述转化为清晰的开发任务：
-```
-"页面加载太慢了，尤其是用户列表，有1000个用户时要等10秒才能显示。"
-↓
-✅ 生成包含性能优化方案的PRD
-```
-
-### 场景2：Discord社区反馈
-整合多个用户的吐槽和建议：
-```
-"A说：文档找不到OAuth配置
-B说：API返回500错误没具体信息
-C说：需要批量操作功能"
-↓
-✅ 生成综合PRD，包含三个需求的优先级评估
-```
-
-### 场景3：内部开发团队反馈
-将开发者的技术建议产品化：
-```
-"如果能优化数据库查询，用户列表加载能快3倍。
-当前的全表扫描太浪费资源了。"
-↓
-✅ 生成技术方案详细的PRD，包含SQL优化建议
-```
+### 输出区域
+- **PRD文档**：结构化Markdown格式，支持一键下载
+- **技术方案**：具体到模块/函数层面的实现建议
+- **优先级矩阵**：基于RICE分数的可视化优先级排序
 
 ## 🛠️ 技术架构
 
-### 前端 (Streamlit)
-- **侧边栏**：API配置、参数调节、示例库
-- **主界面**：反馈输入、解析按钮、结果展示
-- **状态管理**：Session状态保持用户体验
-
-### AI Agent核心
+### 前端层 (Streamlit)
 ```python
-# 三步分析框架
-1. 信息提取 → 2. 问题结构化 → 3. 需求转化
+# 三层界面设计
+1. 配置侧边栏：API自动加载、参数调节、示例选择
+2. 主工作区：反馈输入、解析控制、进度展示
+3. 输出区域：PRD文档、技术方案、下载功能
 
-# 专业提示词工程
-- 技术导向的系统提示词
-- 结构化输出要求
-- 思考过程与PRD分离
+# 状态管理
+- Session State保持用户输入和结果
+- 实时进度反馈增强用户体验
+- 响应式布局适配不同设备
 ```
 
-### API集成
-- **DeepSeek集成**：基于DeepSeek API进行智能分析
-- **简化配置**：固定使用DeepSeek，自动从Secrets加载API Key
-- **参数调节**：支持温度、深度分析等核心参数调节
+### AI Agent核心引擎
+```python
+# 三层分析框架（严格遵循）
+1. 信息提取阶段：
+   - 上下文识别（平台、技术栈、场景）
+   - 情感分析（用户情绪判断）
+   - 事实提取（分离事实与主观评价）
 
-## 📋 PRD输出格式
+2. 问题结构化阶段：
+   - 问题分类（Bug/功能/性能/文档）
+   - 影响评估（用户范围、频率）
+   - 根本原因推测（必须包含底层故障点）
 
-生成的PRD包含以下标准部分：
+3. 需求转化阶段：
+   - PRD结构化输出
+   - 技术方案具体化
+   - RICE模型优先级量化
+```
+
+### 提示词工程
+```python
+# 系统提示词（2450+字符专业模板）
+- 技术专家角色定义：资深技术产品经理 + 全栈工程师
+- 强制性输出要求：技术深度、异常覆盖、量化评估
+- 结构化格式约束：7大部分标准PRD模板
+
+# 动态用户提示词
+- 深度分析模式：五步思考过程 + 完整PRD
+- 快速模式：简要分析 + 标准PRD
+- 输出分隔符：---PRD_START--- 确保正确解析
+```
+
+### API集成层
+```python
+# DeepSeek API配置
+- 固定提供商：DeepSeek（国内用户友好）
+- 固定模型：deepseek-chat（技术分析优化）
+- 自动密钥加载：Streamlit Secrets → 环境变量 → 错误提示
+- 错误处理：优雅降级、用户友好提示
+```
+
+## 📋 PRD输出标准格式
 
 ### 需求名称
-简明扼要的需求标题
+【简明扼要的技术需求标题】
 
 ### 用户痛点
-- 用户身份、使用场景、当前问题、期望结果
+- **用户身份**：开发者、测试工程师、运维人员等
+- **使用场景**：具体的操作流程和环境
+- **当前问题**：详细的技术现象描述
+- **期望结果**：用户希望达到的技术目标
 
-### 优先级评估
-- P0/P1/P2/P3分级
-- 影响范围、紧急程度、解决成本
+### 优先级评估（RICE模型）
+- **Reach（影响范围）**：`500用户（占活跃用户20%）`
+- **Impact（影响程度）**：`2.5/3.0（高影响）`
+- **Confidence（置信度）**：`80%（中高信度）`
+- **Effort（工作量）**：`1.5人周`
+- **RICE分数计算**：`(500 × 2.5 × 0.8) ÷ 1.5 = 666.67`
+- **优先级建议**：`高优先级（RICE分数 > 500）`
 
 ### 功能描述
-- 功能概要、详细需求、交互流程、边界条件
+- **功能概要**：一句话技术实现说明
+- **详细需求**：分点描述具体技术需求
+- **交互流程**：用户操作步骤时序图
+- **边界条件**：特殊场景的技术处理
+- **异常流程（Edge Cases）**：
+  1. 网络中断处理：指数退避重试 + 本地缓存
+  2. 服务超时处理：熔断机制 + 降级方案
+  3. 并发冲突处理：乐观锁 + 事务隔离
 
 ### 验收标准
-- 功能验收、性能验收、兼容性验收
+- **功能验收**：核心功能是否正常
+- **性能验收**：响应时间、资源占用指标
+- **兼容性验收**：不同环境下的技术表现
 
 ### 技术实现方案
-- 架构影响、API设计、数据变更、前端改动、测试建议
+- **架构影响**：需要修改的系统模块
+- **API设计**：新增/修改的接口规范
+- **数据变更**：数据库表结构DDL
+- **前端改动**：UI组件和交互逻辑
+- **测试建议**：单元测试、集成测试重点
 
 ### 风险与依赖
-- 技术风险、依赖项、回滚方案
+- **技术风险**：可能遇到的技术难题
+- **依赖项**：需要其他团队配合的部分
+- **回滚方案**：出现问题时的恢复策略
 
-## ⚙️ 配置选项
+## 🚀 快速开始
 
-### API设置
-- **提供商**：固定使用DeepSeek
-- **模型**：固定使用deepseek-chat
-- **API Key**：从Streamlit Secrets或环境变量自动加载，无需手动输入
+### 环境要求
+- Python 3.10+
+- pip 包管理器
+- DeepSeek API 账户（获取API Key）
 
-### 参数调节
-- **创造力**：控制Agent的创新程度 (0.0-1.0)
-- **深度分析**：启用更详细的分析和拆解
+### 安装步骤
+```bash
+# 1. 克隆仓库
+git clone https://github.com/your-username/DevEcho.git
+cd DevEcho
 
-### 示例库
-- 文档问题、API错误、功能请求、性能问题、复杂反馈
-- 一键填充测试
+# 2. 安装依赖
+pip install -r requirements.txt
+
+# 3. 配置API密钥（开发环境）
+# 方法A：创建.secrets.toml文件
+echo 'DEEPSEEK_API_KEY = "您的DeepSeek API密钥"' > .streamlit/secrets.toml
+
+# 方法B：设置环境变量
+export DEEPSEEK_API_KEY="您的DeepSeek API密钥"
+```
+
+### 运行应用
+```bash
+# 启动Streamlit应用
+streamlit run app.py
+
+# 访问 http://localhost:8501 使用应用
+```
+
+### 使用流程
+1. **粘贴反馈内容**：将GitHub Issue、Discord讨论等粘贴到输入框
+2. **调整参数**（可选）：调节创造力温度，启用深度分析
+3. **开始解析**：点击"🚀 开始智能解析"按钮
+4. **查看结果**：观察Agent思考过程，查看生成的PRD
+5. **下载文档**：一键下载标准化的PRD Markdown文件
+
+## 🎯 典型使用场景
+
+### 场景一：性能问题分析
+**输入反馈**：
+```
+"用户列表加载缓慢，1000条数据需要10+秒，前端卡顿明显"
+```
+
+**Agent输出**：
+- **技术专家视角**：数据库全表扫描、缺少索引、前端虚拟滚动缺失
+- **RICE评估**：Reach=1000用户, Impact=2.0, Confidence=90%, Effort=2人周
+- **异常流程**：网络慢速、大数据集分页、并发查询冲突
+- **完整PRD**：包含索引优化、分页策略、缓存方案等技术细节
+
+### 场景二：API错误排查
+**输入反馈**：
+```
+"调用/users端点频繁返回500错误，日志只有'Internal Server Error'"
+```
+
+**Agent输出**：
+- **技术专家视角**：数据库连接池泄漏、异常处理缺失、监控告警不足
+- **RICE评估**：Reach=所有API用户, Impact=3.0, Confidence=85%, Effort=1人周
+- **异常流程**：连接超时、数据库宕机、认证失效
+- **完整PRD**：连接池配置、详细错误日志、监控集成方案
+
+### 场景三：功能需求转化
+**输入反馈**：
+```
+"需要批量操作用户功能，现在一个一个点太麻烦了"
+```
+
+**Agent输出**：
+- **技术专家视角**：RESTful API设计、事务处理、进度反馈机制
+- **RICE评估**：Reach=管理员用户, Impact=1.5, Confidence=95%, Effort=3人周
+- **异常流程**：部分成功处理、权限校验、操作回滚
+- **完整PRD**：批量API设计、后台任务队列、进度查询接口
 
 ## 🤝 贡献指南
 
-欢迎提交Issue和Pull Request改进项目：
+我们欢迎各种形式的贡献！请参考以下流程：
 
-1. Fork项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开Pull Request
+### 报告问题
+1. 在GitHub Issues中描述遇到的问题
+2. 提供复现步骤、期望行为、实际行为
+3. 如果是Bug，请包含相关日志或截图
+
+### 提交代码
+1. Fork本仓库到您的账户
+2. 创建功能分支：`git checkout -b feature/your-feature`
+3. 提交更改：`git commit -m 'Add: 描述您的功能'`
+4. 推送到分支：`git push origin feature/your-feature`
+5. 创建Pull Request
+
+### 开发规范
+- 遵循PEP 8 Python代码规范
+- 添加适当的类型注解
+- 更新相关文档和示例
+- 确保API向后兼容性
 
 ## 📄 许可证
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
 ## 🙏 致谢
 
-- [Streamlit](https://streamlit.io/) - 优秀的Python Web框架
-- [OpenAI](https://openai.com/) - GPT API服务
-- [DeepSeek](https://www.deepseek.com/) - 国产AI大模型
+- **[Streamlit](https://streamlit.io/)** - 优秀的Python Web应用框架
+- **[DeepSeek](https://www.deepseek.com/)** - 提供强大的AI大模型API
+- **所有贡献者** - 感谢每一位为项目做出贡献的开发者
+
+## 📞 支持与反馈
+
+如果您在使用过程中遇到问题或有改进建议：
+
+1. **查阅文档**：首先查看本README和代码注释
+2. **提交Issue**：在GitHub Issues中描述具体问题
+3. **讨论功能**：欢迎提出新功能建议和改进思路
 
 ---
 
-**DevEcho** - 让开发者的声音被听见，让反馈转化为行动 🚀
+<div align="center">
+
+**DevEcho** - 让每一次开发者反馈都转化为可执行的技术方案
+
+*"From Chaos to Clarity, From Feedback to Action"*
+
+</div>
