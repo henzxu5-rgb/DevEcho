@@ -8,7 +8,7 @@
 - **专业PRD生成**：输出标准化的产品需求文档，包含技术实现方案
 - **思考过程可视化**：展示Agent如何拆解反馈、识别意图
 - **多平台支持**：处理GitHub Issues、Discord讨论、微信群聊等来源的反馈
-- **双AI提供商**：支持OpenAI和DeepSeek API
+- **集成DeepSeek AI**：基于DeepSeek API进行智能分析
 
 ## 🚀 快速开始
 
@@ -23,11 +23,12 @@ streamlit run app.py
 ```
 
 ### 3. 配置使用
-1. 在侧边栏输入API Key（OpenAI或DeepSeek）
-2. 选择模型和调整参数
-3. 粘贴开发者反馈到主输入框
-4. 点击"开始智能解析"
-5. 查看Agent思考过程和生成的PRD
+1. **配置API Key**（推荐使用Streamlit Secrets，详见下方配置说明）
+2. 粘贴开发者反馈到主输入框
+3. 点击"开始智能解析"
+4. 查看Agent思考过程和生成的PRD
+
+> **注意**：应用已固定使用DeepSeek API，无需手动选择供应商或模型。API Key会自动从Streamlit Secrets或环境变量加载。
 
 ## ☁️ 部署到 Streamlit Cloud
 
@@ -61,11 +62,8 @@ cd DevEcho
 
 #### secrets.toml 格式：
 ```toml
-# OpenAI
-OPENAI_API_KEY = "sk-..."
-
-# DeepSeek
-DEEPSEEK_API_KEY = "sk-..."
+# DeepSeek API配置（必需）
+DEEPSEEK_API_KEY = "您的DeepSeek API密钥"
 ```
 
 ### 环境变量配置
@@ -125,9 +123,9 @@ C说：需要批量操作功能"
 ```
 
 ### API集成
-- **OpenAI兼容**：支持GPT-4、GPT-3.5
-- **DeepSeek集成**：国内用户友好
-- **参数透传**：温度、深度分析等配置
+- **DeepSeek集成**：基于DeepSeek API进行智能分析
+- **简化配置**：固定使用DeepSeek，自动从Secrets加载API Key
+- **参数调节**：支持温度、深度分析等核心参数调节
 
 ## 📋 PRD输出格式
 
@@ -158,9 +156,9 @@ C说：需要批量操作功能"
 ## ⚙️ 配置选项
 
 ### API设置
-- **提供商**：OpenAI / DeepSeek
-- **模型**：GPT-4 Turbo、DeepSeek Chat等
-- **API Key**：本地安全存储
+- **提供商**：固定使用DeepSeek
+- **模型**：固定使用deepseek-chat
+- **API Key**：从Streamlit Secrets或环境变量自动加载，无需手动输入
 
 ### 参数调节
 - **创造力**：控制Agent的创新程度 (0.0-1.0)
